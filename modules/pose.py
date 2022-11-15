@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 
 from modules.keypoints import BODY_PARTS_KPT_IDS, BODY_PARTS_PAF_IDS
 from modules.one_euro_filter import OneEuroFilter
@@ -62,6 +63,10 @@ class Pose:
                 (int(x_b), int(y_b)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2, cv2.LINE_AA)
             if global_kpt_a_id != -1 and global_kpt_b_id != -1:
                 cv2.line(img, (int(x_a), int(y_a)), (int(x_b), int(y_b)), Pose.color, 15)
+                
+                # Test
+                print("Distance to Segment " + str(Pose.kpt_names[kpt_a_id]) + " - " + str(Pose.kpt_names[kpt_b_id]) + ":"+ str(pDistance(1828, 1107, x_a, y_a, x_b, y_b)))
+                
 
 
 def get_similarity(a, b, threshold=0.5):
