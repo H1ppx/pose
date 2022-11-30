@@ -96,7 +96,7 @@ def run(net, img, cpu=True):
     return img
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description=''' Pose Est Test''')
+    parser = argparse.ArgumentParser(description=''' Pose Est Video Test''')
     parser.add_argument('--video-path', required=True, help='path to input image')
     args = parser.parse_args()
 
@@ -105,15 +105,16 @@ if __name__ == '__main__':
     load_state(net, checkpoint)
 
     cap = cv2.VideoCapture(args.video_path)
-    output = cv2.VideoWriter('runs/test.mp4', 
+    output = cv2.VideoWriter('test.mjpg',
                 cv2.VideoWriter_fourcc('M','J','P','G'), 
-                cap.get(cv2.CAP_PROP_FPS), 
-                (cap.get(cv2.CAP_PROP_FRAME_WIDTH ),cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+                int(cap.get(5)),(int(cap.get(3)),int(cap.get(4))))
 
     while(cap.isOpened()):
         ret, frame = cap.read()
+        if ret == False:
+            break
         output.write(run(net, frame))
-
-
+            
 cap.release()
+output.release()
 cv2.destroyAllWindows()
