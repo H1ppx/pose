@@ -4,6 +4,7 @@ import math
 import cv2
 import numpy as np
 import torch
+from alive_progress import alive_bar
 
 from models.with_mobilenet import PoseEstimationWithMobileNet
 from modules.keypoints import extract_keypoints, group_keypoints
@@ -105,15 +106,17 @@ if __name__ == '__main__':
     load_state(net, checkpoint)
 
     cap = cv2.VideoCapture(args.video_path)
-    output = cv2.VideoWriter('test.mjpg',
-                cv2.VideoWriter_fourcc('M','J','P','G'), 
+    output = cv2.VideoWriter('test.mp4',
+                cv2.VideoWriter_fourcc('F','M','P','4'),
                 int(cap.get(5)),(int(cap.get(3)),int(cap.get(4))))
 
-    while(cap.isOpened()):
-        ret, frame = cap.read()
-        if ret == False:
-            break
-        output.write(run(net, frame))
+    with alive_bar(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))) as bar:
+        while(cap.isOpened()):
+            ret, frame = cap.read()
+            if ret == False:
+                break
+            output.write(run(net, frame))
+            bar()
             
 cap.release()
 output.release()
