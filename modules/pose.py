@@ -48,6 +48,9 @@ class Pose:
     def draw(self, img):
         assert self.keypoints.shape == (Pose.num_kpts, 2)
 
+        # Segment Guessing Test #TODO
+        guess = tuple()
+        
         for part_id in range(len(BODY_PARTS_PAF_IDS) - 2):
             kpt_a_id = BODY_PARTS_KPT_IDS[part_id][0]
             global_kpt_a_id = self.keypoints[kpt_a_id, 0]
@@ -59,12 +62,12 @@ class Pose:
             if global_kpt_b_id != -1:
                 x_b, y_b = self.keypoints[kpt_b_id]
                 cv2.circle(img, (int(x_b), int(y_b)), 10, Pose.color, -1)
-#                cv2.putText(img, str(Pose.kpt_names[kpt_b_id]) + " : " + str(int(x_b)) + ", " + str(int(y_b)), (int(x_b), int(y_b)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2, cv2.LINE_AA)
             if global_kpt_a_id != -1 and global_kpt_b_id != -1:
                 cv2.line(img, (int(x_a), int(y_a)), (int(x_b), int(y_b)), Pose.color, 5)
                 
 #                # Test
 #                print("Distance to Segment " + str(Pose.kpt_names[kpt_a_id]) + " - " + str(Pose.kpt_names[kpt_b_id]) + ":"+ str(pDistance(1828, 1107, x_a, y_a, x_b, y_b)))
+
                 
 
 
