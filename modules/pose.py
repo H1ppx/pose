@@ -47,9 +47,6 @@ class Pose:
 
     def draw(self, img):
         assert self.keypoints.shape == (Pose.num_kpts, 2)
-
-        # Segment Guessing Test #TODO
-        guess = tuple()
         
         for part_id in range(len(BODY_PARTS_PAF_IDS) - 2):
             kpt_a_id = BODY_PARTS_KPT_IDS[part_id][0]
@@ -64,12 +61,6 @@ class Pose:
                 cv2.circle(img, (int(x_b), int(y_b)), 10, Pose.color, -1)
             if global_kpt_a_id != -1 and global_kpt_b_id != -1:
                 cv2.line(img, (int(x_a), int(y_a)), (int(x_b), int(y_b)), Pose.color, 5)
-                
-#                # Test
-#                print("Distance to Segment " + str(Pose.kpt_names[kpt_a_id]) + " - " + str(Pose.kpt_names[kpt_b_id]) + ":"+ str(pDistance(1828, 1107, x_a, y_a, x_b, y_b)))
-
-                
-
 
 def get_similarity(a, b, threshold=0.5):
     num_similar_kpt = 0
@@ -81,7 +72,6 @@ def get_similarity(a, b, threshold=0.5):
             if similarity > threshold:
                 num_similar_kpt += 1
     return num_similar_kpt
-
 
 def track_poses(previous_poses, current_poses, threshold=3, smooth=False):
     """Propagate poses ids from previous frame results. Id is propagated,
@@ -110,6 +100,24 @@ def track_poses(previous_poses, current_poses, threshold=3, smooth=False):
                 best_matched_id = id
         if best_matched_iou >= threshold:
             mask[best_matched_id] = 0
+
+
+            # TODO: add ghost point for missing keypoints ============================================
+            previous_pose = previous_poses[best_matched_id]
+            for kpt_id in range(Pose.num_kpts):
+
+                # if previous pose has missing keypoint
+                if previous_pose.keypoints[kpt_id, 0] == -1:
+                    break
+
+                # if current pose has missing keypoint
+                if current_pose.keypoints[kpt_id, 0] == -1:
+                    print("Point Lost:", kpt_id)
+                    
+
+
+            # =========================================================================================
+
         else:  # pose not similar to any previous
             best_matched_pose_id = None
         current_pose.update_id(best_matched_pose_id)
@@ -125,34 +133,3 @@ def track_poses(previous_poses, current_poses, threshold=3, smooth=False):
                 current_pose.keypoints[kpt_id, 0] = current_pose.filters[kpt_id][0](current_pose.keypoints[kpt_id, 0])
                 current_pose.keypoints[kpt_id, 1] = current_pose.filters[kpt_id][1](current_pose.keypoints[kpt_id, 1])
             current_pose.bbox = Pose.get_bbox(current_pose.keypoints)
-
-# Get Distance from point to segment
-def pDistance(x, y, x1, y1, x2, y2):
-
-    A = x - x1
-    B = y - y1
-    C = x2 - x1
-    D = y2 - y1
-
-    dot = A * C + B * D
-    len_sq = C * C + D * D
-    param = -1
-    if (len_sq != 0):
-        param = dot / len_sq
-
-    xx = None
-    yy = None
-
-    if (param < 0):
-        xx = x1
-        yy = y1
-    elif (param > 1):
-        xx = x2
-        yy = y2
-    else:
-        xx = x1 + param * C
-        yy = y1 + param * D
-
-    dx = x - xx
-    dy = y - yy
-    return math.sqrt(dx * dx + dy * dy)

@@ -93,7 +93,6 @@ def run(net, img, cpu=True):
     for pose in current_poses:
         cv2.rectangle(img, (pose.bbox[0], pose.bbox[1]),
                       (pose.bbox[0] + pose.bbox[2], pose.bbox[1] + pose.bbox[3]), (0, 255, 0))
-        
     return img
 
 if __name__ == '__main__':
