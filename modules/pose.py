@@ -4,6 +4,7 @@ import math
 
 from modules.keypoints import BODY_PARTS_KPT_IDS, BODY_PARTS_PAF_IDS
 from modules.one_euro_filter import OneEuroFilter
+from modules.kf import Kalman_Filtering
 
 
 class Pose:
@@ -26,6 +27,10 @@ class Pose:
         self.bbox = Pose.get_bbox(self.keypoints)
         self.id = None
         self.filters = [[OneEuroFilter(), OneEuroFilter()] for _ in range(Pose.num_kpts)]
+
+        # Kalman filter
+        self.kf = Kalman_Filtering(Pose.num_kpts)
+        self.kf.initialize()
 
     @staticmethod
     def get_bbox(keypoints):
@@ -100,23 +105,6 @@ def track_poses(previous_poses, current_poses, threshold=3, smooth=False):
                 best_matched_id = id
         if best_matched_iou >= threshold:
             mask[best_matched_id] = 0
-
-
-            # TODO: add ghost point for missing keypoints ============================================
-            previous_pose = previous_poses[best_matched_id]
-            for kpt_id in range(Pose.num_kpts):
-
-                # if previous pose has missing keypoint
-                if previous_pose.keypoints[kpt_id, 0] == -1:
-                    break
-
-                # if current pose has missing keypoint
-                if current_pose.keypoints[kpt_id, 0] == -1:
-                    print("Point Lost:", kpt_id)
-                    
-
-
-            # =========================================================================================
 
         else:  # pose not similar to any previous
             best_matched_pose_id = None

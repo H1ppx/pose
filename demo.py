@@ -110,9 +110,28 @@ if __name__ == '__main__':
             current_poses.append(pose)
 
         track_poses(previous_poses, current_poses, smooth=False)
-        previous_poses = current_poses
+        
+        # if there are no previous poses, set the current poses as the previous poses
+        if not len(previous_poses):
+                previous_poses = current_poses  
+
+        # compare current poses with previous poses, 
+        # if id is the same, update the previous pose with the current pose
+        # else add the current pose to the previous poses
+        for current_pose in current_poses: 
+            loopBroken = False 
+            for previous_pose in previous_poses:
+                if current_pose.id == previous_pose.id:
+                    previous_pose.keypoints = current_pose.keypoints
+                    previous_pose.bbox = current_pose.bbox
+                    loopBroken = True
+                    break
+            if not loopBroken:
+                previous_poses.append(current_pose)
+            
 
         for pose in current_poses:
+            print(pose.keypoints)
             pose.draw(img)
             cv2.rectangle(img, (pose.bbox[0], pose.bbox[1]),
                         (pose.bbox[0] + pose.bbox[2], pose.bbox[1] + pose.bbox[3]), (0, 255, 0))

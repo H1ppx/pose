@@ -1,14 +1,16 @@
 import cv2
 import numpy as np
 
-'''KALMAN FILTERING CLASS FOR N 2D POINTS'''
-'''Kalman filtering for selected points in an image using OpenCV cv2.kalmanFilter class in Python '''
+'''
+Kalman Filter for tracking multiple points
+'''
+
 class Kalman_Filtering:
 
     def __init__(self,n_points):
         self.n_points = n_points
 
-    def initialize(self):
+    def initialize(self, debug=False):
 
         n_states = self.n_points * 4
         n_measures = self.n_points * 2
@@ -44,12 +46,12 @@ class Kalman_Filtering:
         for i in range(0,n_measures):
             kalman.measurementMatrix[i,self.Measurement_array[i]] = 1
 
-
-        print('TRANSITION Matrix:')
-        print(kalman.transitionMatrix)
-
-        print('MEASUREMENT Matrix:')
-        print(kalman.measurementMatrix)
+        if debug:
+            print('TRANSITION Matrix:')
+            print(kalman.transitionMatrix)
+    
+            print('MEASUREMENT Matrix:')
+            print(kalman.measurementMatrix)
 
 
 
